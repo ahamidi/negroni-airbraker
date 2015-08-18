@@ -36,7 +36,7 @@ func (a *AirBraker) ServeHTTP(rw http.ResponseWriter,
 		req := r
 
 		if res.Status() >= 400 && res.Status() < 600 {
-			n := gobrake.NewNotice(errors.New(http.StatusText(res.Status())), r, 1)
+			n := gobrake.NewNotice(errors.New(http.StatusText(res.Status())), r, 2)
 			n.Context["environment"] = a.environment
 			if req != nil {
 				n.Context["uri"] = req.RequestURI
