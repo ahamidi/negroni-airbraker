@@ -9,6 +9,7 @@ Negroni middleware that captures errors being returned and sends them to
 
 1. Capture Panics
 1. Capture non `200` returned status codes
+1. Parse `error` field from response
 
 #### Usage
 
@@ -20,6 +21,17 @@ import (
 
 // "Use" middleware
 n.Use(nam.NewMiddleware("<airbrake_app_id>", "<airbrake_app_key>"))
+```
+
+In order for the error message to be automatically parsed from the response,
+the response should be in the following format:
+
+```JSON
+{
+    "data": {
+        "error": "Error message goes here"
+    }
+}
 ```
 
 #### Building

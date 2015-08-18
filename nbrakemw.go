@@ -1,40 +1,47 @@
 package negronibrake
 
 import (
-	"log"
+	"errors"
 	"net/http"
 
 	"github.com/codegangsta/negroni"
 	"gopkg.in/airbrake/gobrake.v2"
 )
 
-// Middleware is the main airbrake object that sends notifications to the
+// AirBraker is the main airbrake object that sends notifications to the
 // Airbrake service
-type Middleware struct {
+type AirBraker struct {
 	Notifier    *gobrake.Notifier
 	environment string
 }
 
-// NewMiddleware returns *Middleware
-func NewAirBraker(projectID int64, projectKey string, environment string) *Middleware {
+// NewAirBraker returns *AirBraker
+func NewAirBraker(projectID int64, projectKey string, environment string) *AirBraker {
 	n := gobrake.NewNotifier(projectID, projectKey)
-	return &Middleware{
+	return &AirBraker{
 		Notifier:    n,
 		environment: environment,
 	}
 }
 
-// ServeHTTP is the actual Middleware handler
-func (m *Middleware) ServeHTTP(rw http.ResponseWriter,
+// ServeHTTP is the actual AirBraker handler
+func (a *AirBraker) ServeHTTP(rw http.ResponseWriter,
 	r *http.Request,
 	next http.HandlerFunc) {
 
 	defer func() {
 		// Check return code
 		res := rw.(negroni.ResponseWriter)
-		switch {
-		case 400 <= res.Status():
-			log.Println("400 Status")
+		req := r
+
+		if res.Status() >= 400 && res.Status() < 600 {
+			n := gobrake.NewNotice(errors.New(http.StatusText(res.Status())), r, 1)
+			n.Context["environment"] = a.environment
+			if req != nil {
+				n.Context["uri"] = req.RequestURI
+				n.Context["method"] = req.Method
+			}
+			a.Notifier.SendNotice(n)
 		}
 	}()
 

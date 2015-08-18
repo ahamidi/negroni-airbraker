@@ -11,12 +11,17 @@ import (
 
 func TestConstructor(t *testing.T) {
 
+	bmw := NewAirBraker(123123, "test", "test")
+
+	assert.NotNil(t, bmw.Notifier)
+	assert.Equal(t, bmw.environment, "test")
+
 }
 
-func TestMiddleware(t *testing.T) {
+func TestAirBraker(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
-	bmw := NewAirBraker(123123, "test", "test")
+	bmw := NewAirBraker(107344, "acd48cc3b01afcc95ab0b99418c18d0b", "development")
 
 	n := negroni.New()
 	n.Use(bmw)
@@ -26,4 +31,5 @@ func TestMiddleware(t *testing.T) {
 
 	n.ServeHTTP(recorder, (*http.Request)(nil))
 	assert.Equal(t, recorder.Code, http.StatusNotFound)
+
 }
