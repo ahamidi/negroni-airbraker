@@ -2,6 +2,7 @@ package negronibrake
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/codegangsta/negroni"
@@ -41,7 +42,10 @@ func (a *AirBraker) ServeHTTP(rw http.ResponseWriter,
 				n.Context["uri"] = req.RequestURI
 				n.Context["method"] = req.Method
 			}
-			a.Notifier.SendNotice(n)
+			_, err := a.Notifier.SendNotice(n)
+			if err != nil {
+				log.Println("Airbraker Error:", err.Error())
+			}
 		}
 	}()
 
