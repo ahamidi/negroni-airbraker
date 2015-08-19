@@ -3,6 +3,8 @@ package negronibrake
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strconv"
 	"testing"
 
 	"github.com/codegangsta/negroni"
@@ -21,7 +23,8 @@ func TestConstructor(t *testing.T) {
 func TestAirBraker(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
-	bmw := NewAirBraker(107344, "acd48cc3b01afcc95ab0b99418c18d0b", "development")
+	appID, _ := strconv.Atoi(os.Getenv("AIRBRAKE_APP_ID"))
+	bmw := NewAirBraker(int64(appID), os.Getenv("AIRBRAKE_API_KEY"), "development")
 
 	n := negroni.New()
 	n.Use(bmw)
