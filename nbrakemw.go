@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"github.com/codegangsta/negroni"
-	"gopkg.in/airbrake/gobrake.v2"
+	//"gopkg.in/airbrake/gobrake.v2"
+	"github.com/ahamidi/gobrake"
 )
 
 // AirBraker is the main airbrake object that sends notifications to the
